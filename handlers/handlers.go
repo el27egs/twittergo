@@ -42,6 +42,8 @@ func ApiHandler(seed string, request events.APIGatewayProxyRequest) models.ApiRe
 			return routers.GetUser(request)
 		case "tweets":
 			return routers.GetTweets(request)
+		case "images":
+			return routers.DownloadImage(request, claims.ID.Hex())
 		}
 	case "PUT":
 		switch path {

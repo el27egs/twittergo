@@ -81,7 +81,9 @@ func UpdateProfileById(id string, user models.User) (bool, error) {
 	if len(user.LastName) > 0 {
 		data["lastName"] = user.LastName
 	}
-	data["DOB"] = user.DOB
+	if user.DOB.Unix() > 0 {
+		data["DOB"] = user.DOB
+	}
 	if len(user.Avatar) > 0 {
 		data["avatar"] = user.Avatar
 	}
