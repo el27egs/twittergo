@@ -25,7 +25,7 @@ func Connect(settings *models.Settings) error {
 		fmt.Printf("Error Ping %s\n", err)
 		return err
 	}
-	fmt.Println("> Conexion existosa con la base de datos")
+	fmt.Println("> Database connections to MongoDB is DONE.")
 	MongoClient = client
 	DbName = settings.DbName
 	return nil

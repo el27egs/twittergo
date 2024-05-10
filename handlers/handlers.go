@@ -14,35 +14,45 @@ func ApiHandler(seed string, request events.APIGatewayProxyRequest) models.ApiRe
 		Body:   "Invalid call",
 	}
 	httpMethod := request.HTTPMethod
-	fmt.Printf("> HttpRequest %+v\n", request)
+	// fmt.Printf("> HttpRequest %+v\n", request)
 	path := request.PathParameters["twittergo"] // URL_PREFIX was not required here
 	fmt.Printf("> Processing HTTP call: %s %s\n", httpMethod, path)
-	fmt.Printf("> Processing HTTP call: %s %s\n", httpMethod, request.Path)
-
-	validToken, status, message, _ := validateToken(path, seed, request)
-
+	validToken, status, message, claims := validateToken(path, seed, request)
+	fmt.Printf("> Claims after validateToken call %v\n", claims)
 	if !validToken {
 		res.Status = status
 		res.Body = message
 		return res
 	}
-
 	switch httpMethod {
 	case "POST":
 		switch path {
-		case "singup":
+		case "signup":
 			return routers.SingUp(request)
+		case "login":
+			return routers.Login(seed, request)
+		case "tweets":
+			return routers.CreateTweet(request, claims.ID.Hex())
+		case "images":
+			return routers.UploadImage(request, claims.ID.Hex())
 		}
 	case "GET":
 		switch path {
-
+		case "users":
+			return routers.GetUser(request)
+		case "tweets":
+			return routers.GetTweets(request)
 		}
 	case "PUT":
 		switch path {
+		case "users":
+			return routers.UpdateUser(request, claims.ID.Hex())
 
 		}
 	case "DELETE":
 		switch path {
+		case "tweets":
+			return routers.DeleteTweet(request, claims.ID.Hex())
 
 		}
 	}
@@ -50,20 +60,20 @@ func ApiHandler(seed string, request events.APIGatewayProxyRequest) models.ApiRe
 }
 
 func validateToken(path, seed string, req events.APIGatewayProxyRequest) (bool, int, string, models.Claims) {
-	if path == "singup" || path == "login" || path == "avatar" || path == "banner" {
+	if path == "signup" || path == "login" || path == "avatar" || path == "banner" {
 		return true, 200, "", models.Claims{}
 	}
 	token := req.Headers["Authorization"]
 
-	claim, valid, msg, err := security.ProcessJwtToken(token, seed)
+	claims, valid, msg, err := security.ProcessJwtToken(token, seed)
 	if !valid {
 		if err != nil {
-			fmt.Printf("> Error al validar token: %s", err)
+			fmt.Printf("> Error on validating bearer token: %s", err)
 			return false, 401, err.Error(), models.Claims{}
 		} else {
-			fmt.Printf("> Error al validar token: %s", msg)
+			fmt.Printf("> Error on validating bearer token on server: %s", msg)
 			return false, 401, msg, models.Claims{}
 		}
 	}
-	return true, 200, "", *claim
+	return true, 200, "", claims
 }

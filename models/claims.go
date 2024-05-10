@@ -6,7 +6,7 @@ import (
 )
 
 type Claims struct {
-	Email string             `json:"Email"`
-	ID    primitive.ObjectID `bson:"_id" json:"_id,omitempty"`
+	Email string             `json:"email"`
+	ID    primitive.ObjectID `bson:"ID" json:"ID,omitempty"`
 	jwt.RegisteredClaims
 }

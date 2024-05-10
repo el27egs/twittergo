@@ -14,7 +14,7 @@ func SingUp(req events.APIGatewayProxyRequest) models.ApiResponse {
 	var res = models.ApiResponse{
 		Status: 400,
 	}
-	fmt.Printf("> Into SingUp method")
+	fmt.Printf("> Into SingUp method\n")
 	body := req.Body
 	err := json.Unmarshal([]byte(body), &payload)
 	if err != nil {

@@ -10,3 +10,8 @@ func EncryptPassword(password string) (string, error) {
 	}
 	return string(bytes), nil
 }
+
+func ValidatePasswords(hashedPassword, password []byte) bool {
+	err := bcrypt.CompareHashAndPassword(hashedPassword, password)
+	return err == nil
+}
